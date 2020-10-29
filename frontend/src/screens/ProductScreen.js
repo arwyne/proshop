@@ -48,9 +48,9 @@ const ProductScreen = ({ match, history }) => {
                   text={`${product.numReviews} reviews`}
                 />
               </ListGroup.Item>
-              <ListGroup.Item>Price: ${product.price}</ListGroup.Item>
+              <ListGroup.Item>Price: &#8369;{product.price}</ListGroup.Item>
               <ListGroup.Item>
-                Description: ${product.description}
+                Description: {product.description}
               </ListGroup.Item>
             </ListGroup>
           </Col>
@@ -61,7 +61,7 @@ const ProductScreen = ({ match, history }) => {
                   <Row>
                     <Col>Price:</Col>
                     <Col>
-                      <strong>${product.price}</strong>
+                      <strong>&#8369;{product.price}</strong>
                     </Col>
                   </Row>
                 </ListGroup.Item>
