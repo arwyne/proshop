@@ -36,4 +36,4 @@ const addOrderItems = asyncHandler(async (req, res) => {
   }
 })
 
-module.export = { addOrderItems }
+module.exports = { addOrderItems }

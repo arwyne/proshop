@@ -141,8 +141,6 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
       userLogin: { userInfo },
     } = getState()
 
-    console.log(user)
-
     const config = {
       headers: {
         "Content-Type": "application/json",
