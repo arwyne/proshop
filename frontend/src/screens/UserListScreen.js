@@ -21,14 +21,14 @@ const UserListScreen = ({ history }) => {
   const { success: successDelete } = userDelete
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
-      dispatch(listUsers())
-    } else {
-      history.push("/login")
-    }
-
     if (successDelete) {
       dispatch({ type: USER_DELETE_RESET })
+    } else {
+      if (userInfo && userInfo.isAdmin) {
+        dispatch(listUsers())
+      } else {
+        history.push("/login")
+      }
     }
   }, [dispatch, history, userInfo, successDelete])
 
@@ -84,7 +84,7 @@ const UserListScreen = ({ history }) => {
                   )}
                 </td>
                 <td>
-                  <LinkContainer to={`/user/${user._id}/edit`}>
+                  <LinkContainer to={`/admin/user/${user._id}/edit`}>
                     <Button variant="light" className="btn-sm">
                       <i className="fas fa-edit"></i>
                     </Button>
