@@ -4,7 +4,9 @@ import { Table, Button } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux"
 import Message from "../components/Message"
 import Loader from "../components/Loader"
-import { listUsers } from "../actions/userActions"
+import { listUsers, deleteUser } from "../actions/userActions"
+import { USER_DELETE_RESET } from "../constants/userConstants"
+import Swal from "sweetalert2"
 
 const UserListScreen = ({ history }) => {
   const dispatch = useDispatch()
@@ -15,16 +17,36 @@ const UserListScreen = ({ history }) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
+  const userDelete = useSelector((state) => state.userDelete)
+  const { success: successDelete } = userDelete
+
   useEffect(() => {
     if (userInfo && userInfo.isAdmin) {
       dispatch(listUsers())
     } else {
       history.push("/login")
     }
-  }, [dispatch, history])
 
-  const deleteHandler = (id) => {
-    console.log("delete")
+    if (successDelete) {
+      dispatch({ type: USER_DELETE_RESET })
+    }
+  }, [dispatch, history, userInfo, successDelete])
+
+  const deleteHandler = async (id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    })
+
+    if (result.isConfirmed) {
+      Swal.fire("Deleted!", "User has been deleted.", "success")
+      dispatch(deleteUser(id))
+    }
   }
 
   return (
