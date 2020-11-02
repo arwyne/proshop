@@ -4,8 +4,8 @@ import { Table, Button, Row, Col } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux"
 import Message from "../components/Message"
 import Loader from "../components/Loader"
-import { listProducts } from "../actions/productActions"
-// import { PRODUCT_DELETE_RESET } from "../constants/productConstants"
+import { listProducts, deleteProduct } from "../actions/productActions"
+import { PRODUCT_DELETE_RESET } from "../constants/productConstants"
 import Swal from "sweetalert2"
 
 const UserListScreen = ({ history, match }) => {
@@ -14,20 +14,27 @@ const UserListScreen = ({ history, match }) => {
   const productList = useSelector((state) => state.productList)
   const { loading, error, products } = productList
 
+  const productDelete = useSelector((state) => state.productDelete)
+  const {
+    loading: loadingDelete,
+    error: errorDelete,
+    success: successDelete,
+  } = productDelete
+
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
   useEffect(() => {
-    // if (successDelete) {
-    //   dispatch({ type: PRODUCT_DELETE_RESET })
-    // } else {
-    // }
-    if (userInfo && userInfo.isAdmin) {
-      dispatch(listProducts())
+    if (successDelete) {
+      dispatch({ type: PRODUCT_DELETE_RESET })
     } else {
-      history.push("/login")
+      if (userInfo && userInfo.isAdmin) {
+        dispatch(listProducts())
+      } else {
+        history.push("/login")
+      }
     }
-  }, [dispatch, history, userInfo])
+  }, [dispatch, history, userInfo, successDelete])
 
   const deleteHandler = async (id) => {
     const result = await Swal.fire({
@@ -40,9 +47,11 @@ const UserListScreen = ({ history, match }) => {
       confirmButtonText: "Yes, delete it!",
     })
 
-    if (result.isConfirmed) {
-      Swal.fire("Deleted!", "User has been deleted.", "success")
-      // DELETE PRODUCTS
+    if (result.isConfirmed && successDelete) {
+      Swal.fire("Deleted!", "Product has been deleted.", "success")
+      dispatch(deleteProduct(id))
+    } else {
+      dispatch(deleteProduct(id))
     }
   }
 
@@ -62,7 +71,8 @@ const UserListScreen = ({ history, match }) => {
           </Button>
         </Col>
       </Row>
-
+      {loadingDelete && <Loader />}
+      {errorDelete && <Message variant="danger">{errorDelete}</Message>}
       {loading ? (
         <Loader />
       ) : error ? (
