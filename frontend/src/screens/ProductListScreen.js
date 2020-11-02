@@ -2,11 +2,18 @@ import React, { useEffect } from "react"
 import { LinkContainer } from "react-router-bootstrap"
 import { Table, Button, Row, Col } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux"
+import Swal from "sweetalert2"
 import Message from "../components/Message"
 import Loader from "../components/Loader"
-import { listProducts, deleteProduct } from "../actions/productActions"
-import { PRODUCT_DELETE_RESET } from "../constants/productConstants"
-import Swal from "sweetalert2"
+import {
+  listProducts,
+  deleteProduct,
+  createProduct,
+} from "../actions/productActions"
+import {
+  PRODUCT_DELETE_RESET,
+  PRODUCT_CREATE_RESET,
+} from "../constants/productConstants"
 
 const UserListScreen = ({ history, match }) => {
   const dispatch = useDispatch()
@@ -21,12 +28,23 @@ const UserListScreen = ({ history, match }) => {
     success: successDelete,
   } = productDelete
 
+  const productCreate = useSelector((state) => state.productCreate)
+  const {
+    loading: loadingCreate,
+    error: errorCreate,
+    success: successCreate,
+    product: createdProduct,
+  } = productCreate
+
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
   useEffect(() => {
     if (successDelete) {
       dispatch({ type: PRODUCT_DELETE_RESET })
+    } else if (successCreate) {
+      history.push(`/admin/product/${createdProduct._id}/edit`)
+      dispatch({ type: PRODUCT_CREATE_RESET })
     } else {
       if (userInfo && userInfo.isAdmin) {
         dispatch(listProducts())
@@ -34,7 +52,14 @@ const UserListScreen = ({ history, match }) => {
         history.push("/login")
       }
     }
-  }, [dispatch, history, userInfo, successDelete])
+  }, [
+    dispatch,
+    history,
+    userInfo,
+    successDelete,
+    successCreate,
+    createdProduct,
+  ])
 
   const deleteHandler = async (id) => {
     const result = await Swal.fire({
@@ -47,16 +72,14 @@ const UserListScreen = ({ history, match }) => {
       confirmButtonText: "Yes, delete it!",
     })
 
-    if (result.isConfirmed && successDelete) {
+    if (result.isConfirmed) {
       Swal.fire("Deleted!", "Product has been deleted.", "success")
-      dispatch(deleteProduct(id))
-    } else {
       dispatch(deleteProduct(id))
     }
   }
 
-  const createProductHandler = (product) => {
-    // CREATE PRODUCT
+  const createProductHandler = () => {
+    dispatch(createProduct())
   }
 
   return (
@@ -73,6 +96,8 @@ const UserListScreen = ({ history, match }) => {
       </Row>
       {loadingDelete && <Loader />}
       {errorDelete && <Message variant="danger">{errorDelete}</Message>}
+      {loadingCreate && <Loader />}
+      {errorCreate && <Message variant="danger">{errorCreate}</Message>}
       {loading ? (
         <Loader />
       ) : error ? (
