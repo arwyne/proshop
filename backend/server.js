@@ -1,3 +1,4 @@
+const path = require("path")
 const express = require("express")
 const dotenv = require("dotenv")
 const morgan = require("morgan")
@@ -22,10 +23,6 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(express.json())
 
-app.get("/", (req, res) => {
-  res.send("API is running...")
-})
-
 app.use("/api/products", productRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/orders", orderRoutes)
@@ -36,6 +33,14 @@ app.get("/api/config/paypal", (req, res) =>
 )
 
 app.use("/uploads", express.static("uploads"))
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")))
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running...")
+  })
+}
 
 app.use(notFound)
 app.use(errorHandler)
