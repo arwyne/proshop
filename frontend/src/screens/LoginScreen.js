@@ -70,6 +70,19 @@ const LoginScreen = ({ location, history }) => {
           </Link>
         </Col>
       </Row>
+
+      <Row className="py-3">
+        <Col>
+          <p>Admin</p>
+          <p>Email: admin@example.com</p>
+          <p>Password: 123456</p>
+        </Col>
+        <Col>
+          <p>User</p>
+          <p>Email: john@example.com</p>
+          <p>Password: 123456</p>
+        </Col>
+      </Row>
     </FormContainer>
   )
 }
